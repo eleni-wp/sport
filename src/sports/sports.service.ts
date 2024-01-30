@@ -1,44 +1,32 @@
 import { UpdateSportDto } from './dto/upate-sport.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSportDto } from './dto/create-sport.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { Sport } from './schemas/sport.schema';
-import { Model } from 'mongoose';
+import { SportRepository } from './sports.repository';
 
 @Injectable()
 export class SportsService {
-  //Inject sport model mongo
-  constructor(@InjectModel(Sport.name) private sportModel: Model<Sport>) {}
+  constructor(private readonly sportsRepository: SportRepository) {}
   private sports = [];
 
   async getAllSports(): Promise<Sport[]> {
-    return this.sportModel.find().exec();
+    return this.sportsRepository.getAllSports();
   }
   async getSportById(id: string): Promise<Sport> {
-    return this.sportModel.findById(id);
+    return this.sportsRepository.getSportById(id);
   }
   async createSport(createSportDto: CreateSportDto): Promise<Sport> {
-    const createdSport = new this.sportModel(createSportDto);
-
-    return createdSport.save();
+    return this.sportsRepository.createSport(createSportDto);
   }
   async deleteSport(id: string): Promise<void> {
-    await this.sportModel.findByIdAndDelete(id);
+    await this.sportsRepository.deleteSport(id);
   }
   async updateSportDescription(id: string, updateSportDto: UpdateSportDto) {
     try {
-      // const sport = await this.sportModel.findOneAndUpdate(
-      //   { _id: id },
-      //   { description: updateSportDto.description },
-      // );
-
-      const foundSport = await this.sportModel.findOne({ _id: id }).exec();
+      const foundSport = await this.sportsRepository.findOneSport(id);
 
       if (foundSport) {
-        await this.sportModel.updateOne(
-          { _id: id },
-          { description: updateSportDto.description },
-        );
+        await this.sportsRepository.updateSportDescription(id, updateSportDto);
       } else {
         throw new NotFoundException(`Sport with ID "${id}" not found`);
       }
