@@ -40,4 +40,15 @@ export class UsersRepository {
       }
     }
   }
+
+  async addSportToUser(userId: string, sportId: string) {
+    await this.usersRepository.updateOne(
+      { _id: userId },
+      {
+        $push: {
+          sports: sportId,
+        },
+      },
+    );
+  }
 }

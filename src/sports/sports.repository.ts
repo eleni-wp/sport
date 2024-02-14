@@ -6,11 +6,15 @@ import { Sport } from './schemas/sport.schema';
 import { CreateSportDto } from './dto/create-sport.dto';
 import { UpdateSportDto } from './dto/upate-sport.dto';
 import { ObjectId } from 'mongodb';
+import { UsersRepository } from 'src/auth/users.repository';
 
 @Injectable()
 export class SportRepository {
   //Inject sport model mongo
-  constructor(@InjectModel(Sport.name) private sportModel: Model<Sport>) {}
+  constructor(
+    @InjectModel(Sport.name) private sportModel: Model<Sport>,
+    private userRepo: UsersRepository,
+  ) {}
 
   async getAllSports(user: User): Promise<Sport[]> {
     return this.sportModel
@@ -29,13 +33,12 @@ export class SportRepository {
     createSportDto: CreateSportDto,
     user: User,
   ): Promise<Sport> {
-    console.log(12);
-
     const createdSport = new this.sportModel({
       title: createSportDto.title,
       description: createSportDto.description,
       user: user,
     });
+    await this.userRepo.addSportToUser(user._id, createdSport._id);
 
     return createdSport.save();
   }

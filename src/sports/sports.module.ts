@@ -12,6 +12,7 @@ import { SportRepository } from './sports.repository';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { AuthModule } from 'src/auth/auth.module';
 import { User, UserSchema } from 'src/auth/user.entity';
+import { UsersRepository } from 'src/auth/users.repository';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { User, UserSchema } from 'src/auth/user.entity';
     AuthModule,
   ],
   controllers: [SportsController],
-  providers: [SportsService, SportRepository],
+  providers: [SportsService, SportRepository, UsersRepository],
 })
 //Middleware
 export class SportsModule implements NestModule {
